@@ -17,8 +17,9 @@ export default function MyOrders() {
 
   useEffect(() => {
     api
-      .get("/orders/myorders")
+      .get("/orders/my")
       .then(({ data }) => setOrders(data))
+       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
   }, []);
 
@@ -60,7 +61,7 @@ export default function MyOrders() {
               <p className="font-mono text-sm text-ink/50 mb-1">
                 #{order._id.slice(-6)}
               </p>
-              <span className="price-tag">₹{order.totalPrice?.toFixed(2)}</span>
+              <span className="price-tag">₹{order.totalAmount?.toFixed(2)}</span>
               <p className="text-xs text-ink/40 mt-1">
                 {new Date(order.createdAt).toLocaleDateString()}
               </p>
