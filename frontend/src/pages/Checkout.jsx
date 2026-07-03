@@ -7,30 +7,49 @@ import { useCart } from "../context/CartContext";
 export default function Checkout() {
   const { cart, cartTotal, clearCart } = useCart();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ address: "", city: "", postalCode: "", country: "" });
+
+  const [form, setForm] = useState({
+    address: "",
+    city: "",
+    postalCode: "",
+    country: "",
+  });
+
   const [submitting, setSubmitting] = useState(false);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const placeOrder = async (e) => {
     e.preventDefault();
+
+    if (cart.length === 0) {
+      toast.error("Your cart is empty.");
+      return;
+    }
+
     setSubmitting(true);
+
     try {
       await api.post("/orders", {
-        orderItems: cart.map((item) => ({
+        items: cart.map((item) => ({
           product: item._id,
           name: item.name,
-          qty: item.qty,
+          quantity: item.qty,
           price: item.price,
         })),
         shippingAddress: form,
-        totalPrice: cartTotal,
+        totalAmount: cartTotal,
       });
+
       clearCart();
-      toast.success("Order placed!");
+      toast.success("Order placed successfully!");
       navigate("/orders");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Could not place order");
+      toast.error(
+        err.response?.data?.message || "Could not place order"
+      );
     } finally {
       setSubmitting(false);
     }
@@ -45,6 +64,7 @@ export default function Checkout() {
 
         <form onSubmit={placeOrder} className="space-y-3">
           <input
+            type="text"
             name="address"
             placeholder="Address"
             value={form.address}
@@ -52,7 +72,9 @@ export default function Checkout() {
             required
             className="input-field"
           />
+
           <input
+            type="text"
             name="city"
             placeholder="City"
             value={form.city}
@@ -60,7 +82,9 @@ export default function Checkout() {
             required
             className="input-field"
           />
+
           <input
+            type="text"
             name="postalCode"
             placeholder="Postal Code"
             value={form.postalCode}
@@ -68,7 +92,9 @@ export default function Checkout() {
             required
             className="input-field"
           />
+
           <input
+            type="text"
             name="country"
             placeholder="Country"
             value={form.country}
@@ -79,12 +105,19 @@ export default function Checkout() {
 
           <div className="flex items-center justify-between pt-3">
             <span className="font-display text-lg font-medium">
-              Total: <span className="price-tag ml-1 text-base">₹{cartTotal.toFixed(2)}</span>
+              Total:
+              <span className="price-tag ml-2">
+                ₹{cartTotal.toFixed(2)}
+              </span>
             </span>
           </div>
 
-          <button type="submit" disabled={submitting} className="btn-primary w-full">
-            {submitting ? "Placing order..." : "Place Order"}
+          <button
+            type="submit"
+            disabled={submitting}
+            className="btn-primary w-full"
+          >
+            {submitting ? "Placing Order..." : "Place Order"}
           </button>
         </form>
       </div>
