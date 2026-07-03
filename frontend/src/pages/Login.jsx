@@ -1,34 +1,63 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
     try {
       await login(email, password);
       navigate("/");
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
+      toast.error(err.response?.data?.message || "Login failed");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-sm mx-auto mt-16 p-6 border rounded">
-      <h2 className="text-xl font-bold mb-4">Login</h2>
-      {error && <p className="text-red-500 mb-2">{error}</p>}
-      <input className="border p-2 w-full mb-3" placeholder="Email" value={email}
-        onChange={(e) => setEmail(e.target.value)} />
-      <input className="border p-2 w-full mb-3" type="password" placeholder="Password"
-        value={password} onChange={(e) => setPassword(e.target.value)} />
-      <button className="bg-black text-white w-full py-2 rounded">Login</button>
-      <p className="mt-3 text-sm">No account? <Link to="/signup" className="underline">Sign up</Link></p>
-    </form>
+    <div className="max-w-sm mx-auto px-4 py-16">
+      <div className="card p-6">
+        <h1 className="font-display text-2xl font-semibold text-ink mb-1">Welcome back</h1>
+        <p className="text-sm text-ink/60 mb-6">Log in to your MiniShop account.</p>
+
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="input-field"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="input-field"
+          />
+          <button type="submit" disabled={submitting} className="btn-primary w-full">
+            {submitting ? "Logging in..." : "Login"}
+          </button>
+        </form>
+
+        <p className="text-sm text-ink/60 mt-5 text-center">
+          No account?{" "}
+          <Link to="/signup" className="text-teal-600 font-medium">
+            Sign up
+          </Link>
+        </p>
+      </div>
+    </div>
   );
 }

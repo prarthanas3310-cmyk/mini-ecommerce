@@ -1,97 +1,168 @@
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import api from "../api/axios";
+
+const emptyForm = { name: "", description: "", price: "", category: "", image: "", stock: "" };
+
+const statusColors = {
+  pending: "bg-marigold-100 text-marigold-600",
+  processing: "bg-teal-50 text-teal-600",
+  shipped: "bg-teal-100 text-teal-700",
+  delivered: "bg-teal-500 text-white",
+};
 
 export default function Admin() {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [form, setForm] = useState({
-    name: "", description: "", price: "", category: "", image: "", stock: "",
-  });
+  const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
+  const [saving, setSaving] = useState(false);
 
-  const loadData = () => {
-    api.get("/products").then((res) => setProducts(res.data));
-    api.get("/orders").then((res) => setOrders(res.data));
-  };
+  const loadProducts = () => api.get("/products").then(({ data }) => setProducts(data));
+  const loadOrders = () => api.get("/orders").then(({ data }) => setOrders(data));
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => {
+    loadProducts();
+    loadOrders();
+  }, []);
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = { ...form, price: Number(form.price), stock: Number(form.stock) };
-    if (editingId) {
-      await api.put(`/products/${editingId}`, payload);
-    } else {
-      await api.post("/products", payload);
+    setSaving(true);
+    try {
+      const payload = { ...form, price: Number(form.price), stock: Number(form.stock) };
+      if (editingId) {
+        await api.put(`/products/${editingId}`, payload);
+        toast.success("Product updated");
+      } else {
+        await api.post("/products", payload);
+        toast.success("Product created");
+      }
+      setForm(emptyForm);
+      setEditingId(null);
+      loadProducts();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Something went wrong");
+    } finally {
+      setSaving(false);
     }
-    setForm({ name: "", description: "", price: "", category: "", image: "", stock: "" });
-    setEditingId(null);
-    loadData();
   };
 
-  const handleEdit = (p) => {
-    setForm({ name: p.name, description: p.description, price: p.price,
-      category: p.category, image: p.image, stock: p.stock });
-    setEditingId(p._id);
+  const handleEdit = (product) => {
+    setEditingId(product._id);
+    setForm({
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      category: product.category,
+      image: product.image,
+      stock: product.stock,
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDelete = async (id) => {
+    if (!confirm("Delete this product?")) return;
     await api.delete(`/products/${id}`);
-    loadData();
+    toast("Product deleted", { icon: "🗑️" });
+    loadProducts();
   };
 
-  const updateStatus = async (id, status) => {
-    await api.put(`/orders/${id}/status`, { status });
-    loadData();
+  const handleStatusChange = async (orderId, status) => {
+    await api.put(`/orders/${orderId}/status`, { status });
+    toast.success("Order status updated");
+    loadOrders();
   };
 
   return (
-    <div className="p-6 grid md:grid-cols-2 gap-8">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 grid grid-cols-1 lg:grid-cols-2 gap-10">
+      {/* Products */}
       <div>
-        <h2 className="text-xl font-bold mb-4">{editingId ? "Edit" : "Add"} Product</h2>
-        <form onSubmit={handleSubmit} className="space-y-2">
-          {["name", "description", "price", "category", "image", "stock"].map((field) => (
-            <input
-              key={field}
-              className="border p-2 w-full"
-              placeholder={field}
-              value={form[field]}
-              onChange={(e) => setForm({ ...form, [field]: e.target.value })}
-            />
-          ))}
-          <button className="bg-black text-white px-4 py-2 rounded">
-            {editingId ? "Update" : "Create"} Product
-          </button>
+        <h1 className="font-display text-2xl font-semibold text-ink mb-5">
+          {editingId ? "Edit Product" : "Add Product"}
+        </h1>
+
+        <form onSubmit={handleSubmit} className="card p-5 space-y-3 mb-8">
+          <input name="name" placeholder="Name" value={form.name} onChange={handleChange} required className="input-field" />
+          <input name="description" placeholder="Description" value={form.description} onChange={handleChange} className="input-field" />
+          <input name="price" type="number" placeholder="Price" value={form.price} onChange={handleChange} required className="input-field" />
+          <input name="category" placeholder="Category" value={form.category} onChange={handleChange} className="input-field" />
+          <input name="image" placeholder="Image URL" value={form.image} onChange={handleChange} className="input-field" />
+          <input name="stock" type="number" placeholder="Stock" value={form.stock} onChange={handleChange} required className="input-field" />
+
+          <div className="flex gap-2 pt-1">
+            <button type="submit" disabled={saving} className="btn-primary flex-1">
+              {saving ? "Saving..." : editingId ? "Update Product" : "Create Product"}
+            </button>
+            {editingId && (
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingId(null);
+                  setForm(emptyForm);
+                }}
+                className="btn-secondary"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
         </form>
 
-        <h3 className="font-bold mt-6 mb-2">Products</h3>
-        {products.map((p) => (
-          <div key={p._id} className="flex justify-between items-center border-b py-2">
-            <span>{p.name} — ${p.price}</span>
-            <div className="space-x-2">
-              <button onClick={() => handleEdit(p)} className="text-blue-600">Edit</button>
-              <button onClick={() => handleDelete(p._id)} className="text-red-600">Delete</button>
+        <h2 className="font-display text-lg font-medium text-ink mb-3">Products</h2>
+        <div className="space-y-2">
+          {products.map((p) => (
+            <div key={p._id} className="card p-3 flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="font-medium text-ink truncate">{p.name}</p>
+                <span className="price-tag mt-1">₹{p.price}</span>
+              </div>
+              <div className="flex gap-3 text-sm shrink-0">
+                <button onClick={() => handleEdit(p)} className="text-teal-600 font-medium hover:underline">
+                  Edit
+                </button>
+                <button onClick={() => handleDelete(p._id)} className="text-clay font-medium hover:underline">
+                  Delete
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
+      {/* Orders */}
       <div>
-        <h2 className="text-xl font-bold mb-4">Orders</h2>
-        {orders.map((o) => (
-          <div key={o._id} className="border rounded p-3 mb-3">
-            <p>#{o._id.slice(-6)} — {o.user?.name} — ${o.totalAmount.toFixed(2)}</p>
-            <select
-              value={o.status}
-              onChange={(e) => updateStatus(o._id, e.target.value)}
-              className="border p-1 mt-2"
-            >
-              {["pending", "processing", "shipped", "delivered"].map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
+        <h1 className="font-display text-2xl font-semibold text-ink mb-5">Orders</h1>
+        {orders.length === 0 ? (
+          <p className="text-ink/50 text-sm">No orders yet.</p>
+        ) : (
+          <div className="space-y-3">
+            {orders.map((order) => (
+              <div key={order._id} className="card p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-mono text-sm text-ink/60">
+                    #{order._id.slice(-6)} — {order.user?.name || "Customer"}
+                  </p>
+                  <span className="price-tag">₹{order.totalPrice?.toFixed(2)}</span>
+                </div>
+                <select
+                  value={order.status || "pending"}
+                  onChange={(e) => handleStatusChange(order._id, e.target.value)}
+                  className={`text-xs font-mono font-medium px-2.5 py-1.5 rounded-md capitalize border-0 ${
+                    statusColors[order.status] || "bg-ink/10 text-ink/60"
+                  }`}
+                >
+                  <option value="pending">pending</option>
+                  <option value="processing">processing</option>
+                  <option value="shipped">shipped</option>
+                  <option value="delivered">delivered</option>
+                </select>
+              </div>
+            ))}
           </div>
-        ))}
+        )}
       </div>
     </div>
   );

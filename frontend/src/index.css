@@ -1,3 +1,83 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-paper text-ink font-body antialiased;
+}
+
+::selection {
+  @apply bg-marigold-100 text-ink;
+}
+
+/* Focus visibility kept on for keyboard nav, styled to match palette */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid theme("colors.teal.500");
+  outline-offset: 2px;
+}
+
+@layer components {
+  /* The signature element: a stamped, ticket-style price badge */
+  .price-tag {
+    @apply inline-flex items-center gap-1 font-mono text-sm font-medium text-ink;
+    @apply bg-marigold-100 border border-marigold-500/40 rounded px-2 py-0.5;
+    position: relative;
+  }
+  .price-tag::before {
+    content: "";
+    position: absolute;
+    left: -4px;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    background: theme("colors.paper");
+    border: 1px solid theme("colors.marigold.500" / 40%);
+    border-radius: 9999px;
+    transform: translateY(-50%);
+  }
+
+  .eyebrow {
+    @apply font-mono text-[11px] uppercase tracking-[0.14em] text-teal-600;
+  }
+
+  .btn-primary {
+    @apply bg-teal-500 text-white font-medium px-4 py-2 rounded-md transition-colors;
+    @apply hover:bg-teal-600 active:bg-teal-700 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-ink font-medium px-4 py-2 rounded-md border border-ink/15 transition-colors;
+    @apply hover:border-ink/30 hover:bg-ink/[0.03];
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 rounded-md border border-ink/15 bg-white text-ink placeholder:text-ink/40;
+    @apply focus:border-teal-500 transition-colors;
+  }
+
+  .card {
+    @apply bg-white rounded-lg border border-ink/10 shadow-tag;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+.skeleton {
+  background: linear-gradient(90deg, #EDEAE2 25%, #F6F4EF 37%, #EDEAE2 63%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}

@@ -1,37 +1,93 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "../context/CartContext";
+import toast from "react-hot-toast";
 import api from "../api/axios";
+import { useCart } from "../context/CartContext";
 
 export default function Checkout() {
-  const { cartItems, totalPrice, clearCart } = useCart();
-  const [address, setAddress] = useState({ address: "", city: "", postalCode: "", country: "" });
+  const { cart, cartTotal, clearCart } = useCart();
   const navigate = useNavigate();
+  const [form, setForm] = useState({ address: "", city: "", postalCode: "", country: "" });
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const placeOrder = async (e) => {
     e.preventDefault();
-    const items = cartItems.map((i) => ({
-      product: i._id, name: i.name, quantity: i.quantity, price: i.price,
-    }));
-    await api.post("/orders", { items, totalAmount: totalPrice, shippingAddress: address });
-    clearCart();
-    navigate("/orders");
+    setSubmitting(true);
+    try {
+      await api.post("/orders", {
+        orderItems: cart.map((item) => ({
+          product: item._id,
+          name: item.name,
+          qty: item.qty,
+          price: item.price,
+        })),
+        shippingAddress: form,
+        totalPrice: cartTotal,
+      });
+      clearCart();
+      toast.success("Order placed!");
+      navigate("/orders");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Could not place order");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <form onSubmit={placeOrder} className="max-w-md mx-auto mt-10 p-6 border rounded">
-      <h2 className="text-xl font-bold mb-4">Shipping Details</h2>
-      {["address", "city", "postalCode", "country"].map((field) => (
-        <input
-          key={field}
-          className="border p-2 w-full mb-3 capitalize"
-          placeholder={field}
-          value={address[field]}
-          onChange={(e) => setAddress({ ...address, [field]: e.target.value })}
-        />
-      ))}
-      <p className="font-bold mb-3">Total: ${totalPrice.toFixed(2)}</p>
-      <button className="bg-black text-white w-full py-2 rounded">Place Order</button>
-    </form>
+    <div className="max-w-xl mx-auto px-4 sm:px-6 py-8">
+      <div className="card p-6">
+        <h1 className="font-display text-xl font-semibold text-ink mb-5">
+          Shipping Details
+        </h1>
+
+        <form onSubmit={placeOrder} className="space-y-3">
+          <input
+            name="address"
+            placeholder="Address"
+            value={form.address}
+            onChange={handleChange}
+            required
+            className="input-field"
+          />
+          <input
+            name="city"
+            placeholder="City"
+            value={form.city}
+            onChange={handleChange}
+            required
+            className="input-field"
+          />
+          <input
+            name="postalCode"
+            placeholder="Postal Code"
+            value={form.postalCode}
+            onChange={handleChange}
+            required
+            className="input-field"
+          />
+          <input
+            name="country"
+            placeholder="Country"
+            value={form.country}
+            onChange={handleChange}
+            required
+            className="input-field"
+          />
+
+          <div className="flex items-center justify-between pt-3">
+            <span className="font-display text-lg font-medium">
+              Total: <span className="price-tag ml-1 text-base">₹{cartTotal.toFixed(2)}</span>
+            </span>
+          </div>
+
+          <button type="submit" disabled={submitting} className="btn-primary w-full">
+            {submitting ? "Placing order..." : "Place Order"}
+          </button>
+        </form>
+      </div>
+    </div>
   );
 }
