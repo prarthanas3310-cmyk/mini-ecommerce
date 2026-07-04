@@ -1,3 +1,8 @@
+html, body, #root {
+  overflow-x: hidden;
+  width: 100%;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,28 +12,29 @@ html {
 }
 
 body {
-  @apply bg-paper text-ink font-body antialiased;
+  @apply bg-[#0D0D0D] text-white antialiased;
 }
 
 ::selection {
-  @apply bg-marigold-100 text-ink;
+  background: rgba(212, 175, 55, 0.3);
+  color: #ffffff;
 }
 
-/* Focus visibility kept on for keyboard nav, styled to match palette */
+/* Focus visibility kept on for keyboard nav, styled to match the gold palette */
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid theme("colors.teal.500");
+  outline: 2px solid #D4AF37;
   outline-offset: 2px;
 }
 
 @layer components {
   /* The signature element: a stamped, ticket-style price badge */
   .price-tag {
-    @apply inline-flex items-center gap-1 font-mono text-sm font-medium text-ink;
-    @apply bg-marigold-100 border border-marigold-500/40 rounded px-2 py-0.5;
+    @apply inline-flex items-center gap-1 font-mono text-sm font-medium text-[#D4AF37];
+    @apply bg-[#D4AF37]/10 border border-[#D4AF37]/30 rounded px-2 py-0.5;
     position: relative;
   }
   .price-tag::before {
@@ -38,33 +44,33 @@ textarea:focus-visible {
     top: 50%;
     width: 6px;
     height: 6px;
-    background: theme("colors.paper");
-    border: 1px solid theme("colors.marigold.500" / 40%);
+    background: #0D0D0D;
+    border: 1px solid rgba(212, 175, 55, 0.3);
     border-radius: 9999px;
     transform: translateY(-50%);
   }
 
   .eyebrow {
-    @apply font-mono text-[11px] uppercase tracking-[0.14em] text-teal-600;
+    @apply font-mono text-[11px] uppercase tracking-[0.14em] text-[#D4AF37];
   }
 
   .btn-primary {
-    @apply bg-teal-500 text-white font-medium px-4 py-2 rounded-md transition-colors;
-    @apply hover:bg-teal-600 active:bg-teal-700 disabled:opacity-50 disabled:pointer-events-none;
+    @apply bg-[#D4AF37] text-black font-semibold px-4 py-2 rounded-xl transition-all duration-300;
+    @apply hover:bg-[#E6C75C] active:bg-[#C9992E] disabled:opacity-50 disabled:pointer-events-none;
   }
 
   .btn-secondary {
-    @apply bg-white text-ink font-medium px-4 py-2 rounded-md border border-ink/15 transition-colors;
-    @apply hover:border-ink/30 hover:bg-ink/[0.03];
+    @apply bg-transparent text-white font-medium px-4 py-2 rounded-xl border border-[#2C2C2C] transition-colors duration-300;
+    @apply hover:border-[#D4AF37] hover:text-[#D4AF37];
   }
 
   .input-field {
-    @apply w-full px-3 py-2 rounded-md border border-ink/15 bg-white text-ink placeholder:text-ink/40;
-    @apply focus:border-teal-500 transition-colors;
+    @apply w-full px-4 py-3 rounded-xl border border-[#2C2C2C] bg-[#0D0D0D] text-white placeholder:text-gray-500;
+    @apply focus:border-[#D4AF37] transition-colors duration-200;
   }
 
   .card {
-    @apply bg-white rounded-lg border border-ink/10 shadow-tag;
+    @apply bg-[#171717] rounded-2xl border border-[#2C2C2C];
   }
 }
 
@@ -77,7 +83,7 @@ textarea:focus-visible {
   }
 }
 .skeleton {
-  background: linear-gradient(90deg, #EDEAE2 25%, #F6F4EF 37%, #EDEAE2 63%);
+  background: linear-gradient(90deg, #171717 25%, #222222 37%, #171717 63%);
   background-size: 800px 100%;
   animation: shimmer 1.4s ease-in-out infinite;
 }

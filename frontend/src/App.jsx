@@ -11,10 +11,12 @@ import MyOrders from "./pages/MyOrders";
 import Admin from "./pages/Admin";
 import Wishlist from "./pages/Wishlist";
 import NotFound from "./pages/NotFound";
+import ScrollToTop from "./components/ScrollToTop";
 
 export default function App() {
   return (
     <div className="min-h-screen bg-paper">
+       <ScrollToTop />
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
