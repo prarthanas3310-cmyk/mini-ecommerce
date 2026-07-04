@@ -7,68 +7,127 @@ import StarRating from "./StarRating";
 export default function ProductCard({ product }) {
   const { addToCart } = useCart();
   const { isWishlisted, toggleWishlist } = useWishlist();
+
   const outOfStock = product.stock <= 0;
   const lowStock = !outOfStock && product.stock <= 5;
   const saved = isWishlisted(product._id);
 
   return (
-    <div className="card group overflow-hidden flex flex-col transition-transform duration-200 hover:-translate-y-1 hover:shadow-lg">
+    <div className="group overflow-hidden rounded-2xl bg-[#171717] border border-[#2C2C2C] transition-all duration-300 hover:-translate-y-2 hover:border-[#D4AF37] hover:shadow-[0_15px_35px_rgba(212,175,55,0.25)]">
+
+      {/* IMAGE */}
       <div className="relative">
+
+        {product.stock > 15 && (
+          <span className="absolute top-3 left-3 z-10 bg-[#D4AF37] text-black text-xs font-bold px-3 py-1 rounded-full shadow">
+            NEW
+          </span>
+        )}
+
         <Link to={`/product/${product._id}`} className="block">
-          <div className="aspect-[4/3] w-full overflow-hidden bg-teal-50">
+
+          <div className="aspect-[4/3] w-full overflow-hidden bg-[#111111]">
+
             <img
               src={product.image}
               alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               loading="lazy"
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
             />
+
           </div>
+
         </Link>
 
         <button
           onClick={() => toggleWishlist(product)}
-          aria-label={saved ? "Remove from wishlist" : "Add to wishlist"}
-          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-tag transition-transform hover:scale-110"
+          aria-label={
+            saved
+              ? "Remove from wishlist"
+              : "Add to wishlist"
+          }
+          className="absolute top-3 right-3 w-10 h-10 rounded-full bg-black/70 backdrop-blur border border-[#2C2C2C] flex items-center justify-center transition-all duration-300 hover:border-[#D4AF37] hover:scale-110"
         >
           <Heart
-            size={16}
-            className={saved ? "fill-clay text-clay" : "text-ink/50"}
+            size={18}
+            className={
+              saved
+                ? "fill-[#D4AF37] text-[#D4AF37]"
+                : "text-gray-400"
+            }
           />
         </button>
+
       </div>
 
-      <div className="p-4 flex flex-col gap-2 flex-1">
-        {product.category && <span className="eyebrow">{product.category}</span>}
+      {/* CONTENT */}
+
+      <div className="p-5 flex flex-col flex-1">
+
+        {product.category && (
+          <span className="text-xs uppercase tracking-[2px] text-[#D4AF37] mb-2">
+            {product.category}
+          </span>
+        )}
+
         <Link to={`/product/${product._id}`}>
-          <h3 className="font-display text-lg font-medium text-ink leading-snug line-clamp-2 hover:text-teal-600 transition-colors">
+
+          <h3 className="text-lg font-semibold text-white leading-snug line-clamp-2 hover:text-[#D4AF37] transition-colors duration-300">
             {product.name}
           </h3>
+
         </Link>
 
         {product.numReviews > 0 && (
-          <div className="flex items-center gap-1.5">
-            <StarRating value={product.avgRating} size={12} />
-            <span className="text-[11px] text-ink/40">({product.numReviews})</span>
+          <div className="flex items-center gap-2 mt-2">
+
+            <StarRating
+              value={product.avgRating}
+              size={13}
+            />
+
+            <span className="text-xs text-gray-400">
+              ({product.numReviews})
+            </span>
+
           </div>
         )}
 
-        <div className="mt-auto pt-2 flex items-center justify-between gap-2">
-          <span className="price-tag">₹{product.price}</span>
+        <div className="flex items-center justify-between mt-5">
+
+          <span className="text-2xl font-bold text-[#D4AF37]">
+            ₹{product.price}
+          </span>
 
           <button
-            onClick={() => !outOfStock && addToCart(product, 1)}
+            onClick={() =>
+              !outOfStock &&
+              addToCart(product, 1)
+            }
             disabled={outOfStock}
-            className="inline-flex items-center gap-1 text-xs font-medium bg-teal-500 text-white px-2.5 py-1.5 rounded-md hover:bg-teal-600 transition-colors disabled:opacity-40 disabled:pointer-events-none"
             aria-label={`Add ${product.name} to cart`}
+            className="inline-flex items-center gap-2 bg-[#D4AF37] text-black px-4 py-2 rounded-lg font-semibold hover:bg-[#E6C75C] transition-all duration-300 disabled:opacity-40 disabled:pointer-events-none"
           >
-            <Plus size={13} />
+            <Plus size={16} />
             Add
           </button>
+
         </div>
 
-        {outOfStock && <span className="text-xs font-mono text-clay">Out of stock</span>}
-        {lowStock && <span className="text-xs font-mono text-clay">Only {product.stock} left</span>}
+        {outOfStock && (
+          <span className="mt-3 text-sm text-red-400 font-medium">
+            Out of Stock
+          </span>
+        )}
+
+        {lowStock && (
+          <span className="mt-3 text-sm text-orange-400 font-medium">
+            Only {product.stock} left
+          </span>
+        )}
+
       </div>
+
     </div>
   );
 }

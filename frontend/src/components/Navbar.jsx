@@ -35,30 +35,31 @@ export default function Navbar() {
   const closeMenu = () => setMenuOpen(false);
 
   const linkClass =
-    "text-sm font-medium text-white/90 hover:text-white transition-colors";
+    "text-sm font-medium text-gray-300 hover:text-[#D4AF37] transition-all duration-300";
 
   return (
     <header
-      className={`sticky top-0 z-50 bg-teal-600 ${
-        scrolled ? "shadow-lg" : ""
+      className={`sticky top-0 z-50 bg-[#0D0D0D] border-b border-[#2C2C2C] transition-all duration-300 ${
+        scrolled ? "shadow-2xl shadow-black/50" : ""
       }`}
     >
-      <nav className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <nav className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
 
+        {/* Logo */}
         <Link
-  to="/"
-  onClick={closeMenu}
-  className="flex items-center"
->
-  <img
-    src={logo}
-    alt="PARZEN"
-    className="h-12 md:h-14 w-auto object-contain"
-  />
-</Link>
+          to="/"
+          onClick={closeMenu}
+          className="flex items-center"
+        >
+          <img
+            src={logo}
+            alt="PARZEN"
+            className="h-16 md:h-20 w-auto object-contain transition-transform duration-300 hover:scale-105"
+          />
+        </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-8">
 
           <Link to="/" className={linkClass}>
             Products
@@ -76,13 +77,13 @@ export default function Navbar() {
 
           <Link
             to="/cart"
-            className={`${linkClass} flex items-center gap-1 relative`}
+            className={`${linkClass} flex items-center gap-2 relative`}
           >
             <ShoppingBag size={18} />
             Cart
 
             {cartCount > 0 && (
-              <span className="absolute -top-2 -right-3 bg-yellow-400 text-black rounded-full text-xs px-1.5">
+              <span className="absolute -top-2 -right-3 bg-[#D4AF37] text-black font-bold rounded-full text-xs px-2 py-0.5">
                 {cartCount}
               </span>
             )}
@@ -93,10 +94,14 @@ export default function Navbar() {
               <Link to="/orders" className={linkClass}>
                 My Orders
               </Link>
-              <Link to="/wishlist" className={`${linkClass} flex items-center gap-1`}>
-      <Heart size={16} />
-      Wishlist
-    </Link>
+
+              <Link
+                to="/wishlist"
+                className={`${linkClass} flex items-center gap-1`}
+              >
+                <Heart size={16} />
+                Wishlist
+              </Link>
 
               <button
                 onClick={handleLogout}
@@ -114,7 +119,7 @@ export default function Navbar() {
 
               <Link
                 to="/signup"
-                className="bg-white text-teal-600 px-4 py-2 rounded-md font-medium hover:bg-gray-100"
+                className="bg-[#D4AF37] text-black px-5 py-2 rounded-lg font-semibold hover:bg-[#E6C75C] transition-all duration-300 shadow-lg hover:shadow-yellow-500/30"
               >
                 Signup
               </Link>
@@ -124,7 +129,7 @@ export default function Navbar() {
 
         {/* Mobile Button */}
         <button
-          className="md:hidden text-white"
+          className="md:hidden text-[#D4AF37]"
           onClick={() => setMenuOpen(!menuOpen)}
         >
           {menuOpen ? <X size={28} /> : <Menu size={28} />}
@@ -133,12 +138,12 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden bg-teal-600 px-4 pb-4 space-y-4">
+        <div className="md:hidden bg-[#0D0D0D] border-t border-[#2C2C2C] px-6 py-6 space-y-5">
 
           <Link
             to="/"
             onClick={closeMenu}
-            className="block text-white"
+            className="block text-gray-300 hover:text-[#D4AF37] transition"
           >
             Products
           </Link>
@@ -147,7 +152,7 @@ export default function Navbar() {
             <Link
               to="/admin"
               onClick={closeMenu}
-              className="block text-white"
+              className="block text-gray-300 hover:text-[#D4AF37]"
             >
               Admin
             </Link>
@@ -156,7 +161,7 @@ export default function Navbar() {
           <Link
             to="/cart"
             onClick={closeMenu}
-            className="block text-white"
+            className="block text-gray-300 hover:text-[#D4AF37]"
           >
             Cart ({cartCount})
           </Link>
@@ -166,24 +171,22 @@ export default function Navbar() {
               <Link
                 to="/orders"
                 onClick={closeMenu}
-                className="block text-white"
+                className="block text-gray-300 hover:text-[#D4AF37]"
               >
                 My Orders
               </Link>
 
-
-    <Link
-      to="/wishlist"
-      onClick={closeMenu}
-      className="block text-white"
-    >
-      Wishlist
-    </Link>
-
+              <Link
+                to="/wishlist"
+                onClick={closeMenu}
+                className="block text-gray-300 hover:text-[#D4AF37]"
+              >
+                Wishlist
+              </Link>
 
               <button
                 onClick={handleLogout}
-                className="block text-white"
+                className="block text-gray-300 hover:text-[#D4AF37]"
               >
                 Logout
               </button>
@@ -193,7 +196,7 @@ export default function Navbar() {
               <Link
                 to="/login"
                 onClick={closeMenu}
-                className="block text-white"
+                className="block text-gray-300 hover:text-[#D4AF37]"
               >
                 Login
               </Link>
@@ -201,7 +204,7 @@ export default function Navbar() {
               <Link
                 to="/signup"
                 onClick={closeMenu}
-                className="block bg-white text-teal-600 rounded-md px-3 py-2 w-fit"
+                className="inline-block bg-[#D4AF37] text-black px-5 py-2 rounded-lg font-semibold hover:bg-[#E6C75C] transition-all duration-300"
               >
                 Signup
               </Link>
