@@ -56,23 +56,41 @@ export default function MyOrders() {
 
       <div className="space-y-3">
         {orders.map((order) => (
-          <div key={order._id} className="card p-4 flex items-center justify-between gap-4">
-            <div>
-              <p className="font-mono text-sm text-ink/50 mb-1">
-                #{order._id.slice(-6)}
-              </p>
-              <span className="price-tag">₹{order.totalAmount?.toFixed(2)}</span>
-              <p className="text-xs text-ink/40 mt-1">
-                {new Date(order.createdAt).toLocaleDateString()}
-              </p>
+          <div key={order._id} className="card p-4">
+            <div className="flex items-center justify-between gap-4 mb-3">
+              <div>
+                <p className="font-mono text-sm text-ink/50 mb-1">
+                  #{order._id.slice(-6)}
+                </p>
+                <p className="text-xs text-ink/40">
+                  {new Date(order.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+              <span
+                className={`text-xs font-mono font-medium px-2.5 py-1 rounded-full capitalize ${
+                  statusColors[order.status] || "bg-ink/10 text-ink/60"
+                }`}
+              >
+                {order.status || "pending"}
+              </span>
             </div>
-            <span
-              className={`text-xs font-mono font-medium px-2.5 py-1 rounded-full capitalize ${
-                statusColors[order.status] || "bg-ink/10 text-ink/60"
-              }`}
-            >
-              {order.status || "pending"}
-            </span>
+
+            <div className="border-t border-ink/10 pt-3 space-y-1.5">
+              {order.items?.map((item, idx) => (
+                <div key={idx} className="flex items-center justify-between text-sm">
+                  <span className="text-ink/70">
+                    {item.name} <span className="text-ink/40">× {item.quantity}</span>
+                  </span>
+                  <span className="font-mono text-ink/60">
+                    ₹{(item.price * item.quantity).toFixed(2)}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="border-t border-ink/10 mt-3 pt-3 flex justify-end">
+              <span className="price-tag">₹{order.totalAmount?.toFixed(2)}</span>
+            </div>
           </div>
         ))}
       </div>
