@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Heart } from "lucide-react";
+import { Plus, Heart, Check } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
 import StarRating from "./StarRating";
@@ -7,10 +8,25 @@ import StarRating from "./StarRating";
 export default function ProductCard({ product }) {
   const { addToCart } = useCart();
   const { isWishlisted, toggleWishlist } = useWishlist();
+  const [justAdded, setJustAdded] = useState(false);
+  const [heartPop, setHeartPop] = useState(false);
 
   const outOfStock = product.stock <= 0;
   const lowStock = !outOfStock && product.stock <= 5;
   const saved = isWishlisted(product._id);
+
+  const handleAddToCart = () => {
+    if (outOfStock) return;
+    addToCart(product, 1);
+    setJustAdded(true);
+    setTimeout(() => setJustAdded(false), 1400);
+  };
+
+  const handleToggleWishlist = () => {
+    toggleWishlist(product);
+    setHeartPop(true);
+    setTimeout(() => setHeartPop(false), 300);
+  };
 
   return (
     <div className="group overflow-hidden rounded-2xl bg-[#171717] border border-[#2C2C2C] transition-all duration-300 hover:-translate-y-2 hover:border-[#D4AF37] hover:shadow-[0_15px_35px_rgba(212,175,55,0.25)]">
@@ -40,7 +56,7 @@ export default function ProductCard({ product }) {
         </Link>
 
         <button
-          onClick={() => toggleWishlist(product)}
+          onClick={handleToggleWishlist}
           aria-label={
             saved
               ? "Remove from wishlist"
@@ -50,11 +66,9 @@ export default function ProductCard({ product }) {
         >
           <Heart
             size={18}
-            className={
-              saved
-                ? "fill-[#D4AF37] text-[#D4AF37]"
-                : "text-gray-400"
-            }
+            className={`transition-transform duration-300 ${
+              heartPop ? "scale-125" : "scale-100"
+            } ${saved ? "fill-[#D4AF37] text-[#D4AF37]" : "text-gray-400"}`}
           />
         </button>
 
@@ -100,16 +114,26 @@ export default function ProductCard({ product }) {
           </span>
 
           <button
-            onClick={() =>
-              !outOfStock &&
-              addToCart(product, 1)
-            }
-            disabled={outOfStock}
+            onClick={handleAddToCart}
+            disabled={outOfStock || justAdded}
             aria-label={`Add ${product.name} to cart`}
-            className="inline-flex items-center gap-2 bg-[#D4AF37] text-black px-4 py-2 rounded-lg font-semibold hover:bg-[#E6C75C] transition-all duration-300 disabled:opacity-40 disabled:pointer-events-none"
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300 disabled:pointer-events-none ${
+              justAdded
+                ? "bg-green-500 text-white"
+                : "bg-[#D4AF37] text-black hover:bg-[#E6C75C] disabled:opacity-40"
+            }`}
           >
-            <Plus size={16} />
-            Add
+            {justAdded ? (
+              <>
+                <Check size={16} />
+                Added
+              </>
+            ) : (
+              <>
+                <Plus size={16} />
+                Add
+              </>
+            )}
           </button>
 
         </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Minus, Plus, ChevronLeft } from "lucide-react";
+import { Minus, Plus, ChevronLeft, Check } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../api/axios";
 import { useCart } from "../context/CartContext";
@@ -26,9 +26,25 @@ export default function ProductDetail() {
     comment: "",
   });
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
+  const [isZooming, setIsZooming] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
 
   const { addToCart } = useCart();
   const { user } = useAuth();
+
+  const handleImageMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setZoomPos({ x, y });
+  };
+
+  const handleAddToCart = () => {
+    addToCart(product, qty);
+    setJustAdded(true);
+    setTimeout(() => setJustAdded(false), 1600);
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -196,13 +212,30 @@ return (
 
         {/* Product Image */}
 
-        <div className="rounded-3xl bg-[#171717] border border-[#2C2C2C] p-6 overflow-hidden shadow-2xl">
+        <div
+          className="rounded-3xl bg-[#171717] border border-[#2C2C2C] p-6 overflow-hidden shadow-2xl cursor-zoom-in"
+          onMouseEnter={() => setIsZooming(true)}
+          onMouseLeave={() => setIsZooming(false)}
+          onMouseMove={handleImageMouseMove}
+        >
 
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-full object-cover rounded-2xl transition-transform duration-500 hover:scale-105"
-          />
+          <div className="relative w-full h-full overflow-hidden rounded-2xl">
+
+            <img
+              src={product.image}
+              alt={product.name}
+              className="w-full h-full object-cover transition-transform duration-200 ease-out"
+              style={
+                isZooming
+                  ? {
+                      transform: "scale(2)",
+                      transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
+                    }
+                  : { transform: "scale(1)" }
+              }
+            />
+
+          </div>
 
         </div>
 
@@ -297,12 +330,30 @@ return (
               {/* Add to Cart */}
 
               <button
-                onClick={() =>
-                  addToCart(product, qty)
-                }
-                className="flex-1 bg-[#D4AF37] text-black font-bold py-4 rounded-xl hover:bg-[#E6C75C] transition-all duration-300 shadow-lg"
+                onClick={handleAddToCart}
+                disabled={justAdded}
+                className={`flex-1 font-bold py-4 rounded-xl transition-all duration-300 shadow-lg overflow-hidden relative ${
+                  justAdded
+                    ? "bg-green-500 text-white"
+                    : "bg-[#D4AF37] text-black hover:bg-[#E6C75C]"
+                }`}
               >
-                Add to Cart
+                <span
+                  className={`inline-flex items-center justify-center gap-2 transition-all duration-300 ${
+                    justAdded
+                      ? "opacity-100 scale-100"
+                      : "opacity-100 scale-100"
+                  }`}
+                >
+                  {justAdded ? (
+                    <>
+                      <Check size={20} className="animate-[bounce_0.6s_ease-in-out_1]" />
+                      Added to Cart
+                    </>
+                  ) : (
+                    "Add to Cart"
+                  )}
+                </span>
               </button>
 
             </div>
@@ -314,15 +365,19 @@ return (
       </div>
 
       {/* Reviews */}
-      <div className="mt-14 max-w-2xl">
-        <h2 className="font-display text-xl font-semibold text-ink mb-5">
-          Reviews {product.numReviews > 0 && `(${product.numReviews})`}
+      <div className="mt-20 max-w-5xl">
+        <h2 className="text-3xl font-bold text-white mb-8">
+          Customer Reviews{" "}
+          {product.numReviews > 0 && `(${product.numReviews})`}
         </h2>
 
         {user && !alreadyReviewed && (
-          <form onSubmit={submitReview} className="card p-4 mb-6 space-y-3">
+          <form
+            onSubmit={submitReview}
+            className="bg-[#171717] border border-[#2C2C2C] rounded-2xl p-6 mb-8 space-y-5"
+          >
             <div>
-              <p className="text-xs text-ink/50 mb-1">Your rating</p>
+              <p className="text-sm text-gray-400 mb-2">Your rating</p>
               <StarRating
                 value={reviewForm.rating}
                 interactive
@@ -336,17 +391,21 @@ return (
               onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })}
               required
               rows={3}
-              className="input-field resize-none"
+              className="w-full bg-[#0D0D0D] border border-[#2C2C2C] rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:border-[#D4AF37] resize-none"
             />
-            <button type="submit" disabled={submittingReview} className="btn-primary">
+            <button
+              type="submit"
+              disabled={submittingReview}
+              className="bg-[#D4AF37] text-black font-semibold px-6 py-3 rounded-xl hover:bg-[#E6C75C] transition disabled:opacity-50"
+            >
               {submittingReview ? "Submitting..." : "Submit Review"}
             </button>
           </form>
         )}
 
         {!user && (
-          <p className="text-sm text-ink/50 mb-6">
-            <Link to="/login" className="text-teal-600 font-medium">
+          <p className="text-gray-400 mb-6">
+            <Link to="/login" className="text-[#D4AF37] font-semibold hover:underline">
               Log in
             </Link>{" "}
             to leave a review.
@@ -354,17 +413,20 @@ return (
         )}
 
         {reviews.length === 0 ? (
-          <p className="text-sm text-ink/40">No reviews yet — be the first to review this product.</p>
+          <p className="text-gray-500">No reviews yet — be the first to review this product.</p>
         ) : (
           <div className="space-y-4">
             {reviews.map((r) => (
-              <div key={r._id} className="border-b border-ink/10 pb-4">
+              <div
+                key={r._id}
+                className="bg-[#171717] border border-[#2C2C2C] rounded-2xl p-5 mb-5"
+              >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-sm text-ink">{r.name}</span>
+                  <span className="font-semibold text-white">{r.name}</span>
                   <StarRating value={r.rating} size={13} />
                 </div>
-                <p className="text-sm text-ink/60">{r.comment}</p>
-                <p className="text-xs text-ink/30 mt-1">
+                <p className="text-gray-300 mt-2">{r.comment}</p>
+                <p className="text-xs text-gray-500 mt-3">
                   {new Date(r.createdAt).toLocaleDateString()}
                 </p>
               </div>

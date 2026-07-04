@@ -9,6 +9,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [focusField, setFocusField] = useState(null);
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -28,60 +29,99 @@ export default function Login() {
   };
 
   return (
-    <div className="max-w-sm mx-auto px-4 py-16">
-      <div className="card p-6">
-        <h1 className="font-display text-2xl font-semibold text-ink mb-1">
-          Welcome back
-        </h1>
+    <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center px-4 py-16 relative overflow-hidden">
+      {/* Ambient gold glow */}
+      <div className="pointer-events-none absolute -top-40 -left-40 w-96 h-96 bg-[#D4AF37]/10 rounded-full blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-40 -right-40 w-96 h-96 bg-[#D4AF37]/10 rounded-full blur-3xl" />
 
-        <p className="text-sm text-ink/60 mb-6">
-          Log in to your MiniShop account.
-        </p>
+      <div className="relative w-full max-w-md">
+        {/* Glass card */}
+        <div className="bg-[#171717]/80 backdrop-blur-xl border border-[#2C2C2C] rounded-3xl p-8 sm:p-10 shadow-2xl">
+          <span className="uppercase tracking-[4px] text-[#D4AF37] text-xs">
+            Welcome back
+          </span>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="input-field"
-          />
+          <h1 className="text-3xl font-bold text-white mt-3 mb-2">
+            Log in to your account
+          </h1>
 
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="input-field pr-10"
-            />
+          <p className="text-gray-400 mb-8">
+            Enter your details to continue shopping.
+          </p>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Email */}
+            <div className="relative">
+              <label
+                className={`absolute left-4 transition-all duration-200 pointer-events-none ${
+                  focusField === "email" || email
+                    ? "-top-2.5 text-xs bg-[#171717] px-1 text-[#D4AF37]"
+                    : "top-3.5 text-gray-500"
+                }`}
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onFocus={() => setFocusField("email")}
+                onBlur={() => setFocusField(null)}
+                required
+                className="w-full bg-[#0D0D0D] border border-[#2C2C2C] rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#D4AF37] transition-colors duration-200"
+              />
+            </div>
+
+            {/* Password */}
+            <div className="relative">
+              <label
+                className={`absolute left-4 transition-all duration-200 pointer-events-none ${
+                  focusField === "password" || password
+                    ? "-top-2.5 text-xs bg-[#171717] px-1 text-[#D4AF37]"
+                    : "top-3.5 text-gray-500"
+                }`}
+              >
+                Password
+              </label>
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onFocus={() => setFocusField("password")}
+                onBlur={() => setFocusField(null)}
+                required
+                className="w-full bg-[#0D0D0D] border border-[#2C2C2C] rounded-xl px-4 py-3.5 pr-12 text-white focus:outline-none focus:border-[#D4AF37] transition-colors duration-200"
+              />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#D4AF37] transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+              </button>
+            </div>
 
             <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              type="submit"
+              disabled={submitting}
+              className="w-full bg-[#D4AF37] text-black font-semibold py-3.5 rounded-xl hover:bg-[#E6C75C] transition-all duration-300 shadow-lg shadow-[#D4AF37]/10 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
+              {submitting ? "Logging in..." : "Log In"}
             </button>
-          </div>
+          </form>
 
-          <button
-            type="submit"
-            disabled={submitting}
-            className="btn-primary w-full"
-          >
-            {submitting ? "Logging in..." : "Login"}
-          </button>
-        </form>
-
-        <p className="text-sm text-ink/60 mt-5 text-center">
-          No account?{" "}
-          <Link to="/signup" className="text-teal-600 font-medium">
-            Sign up
-          </Link>
-        </p>
+          <p className="text-gray-400 mt-8 text-center">
+            No account?{" "}
+            <Link
+              to="/signup"
+              className="text-[#D4AF37] font-semibold hover:underline"
+            >
+              Sign up
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

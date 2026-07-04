@@ -15,6 +15,7 @@ export default function Checkout() {
     postalCode: "",
     country: "",
   });
+  const [focusField, setFocusField] = useState(null);
 
   const [submitting, setSubmitting] = useState(false);
   const [couponInput, setCouponInput] = useState("");
@@ -83,113 +84,150 @@ export default function Checkout() {
     }
   };
 
+  const floatField = (name, label, extraClass = "") => (
+    <div className="relative">
+      <label
+        className={`absolute left-4 transition-all duration-200 pointer-events-none ${
+          focusField === name || form[name]
+            ? "-top-2.5 text-xs bg-[#171717] px-1 text-[#D4AF37]"
+            : "top-3.5 text-gray-500"
+        }`}
+      >
+        {label}
+      </label>
+      <input
+        type="text"
+        name={name}
+        value={form[name]}
+        onChange={handleChange}
+        onFocus={() => setFocusField(name)}
+        onBlur={() => setFocusField(null)}
+        required
+        className={`w-full bg-[#0D0D0D] border border-[#2C2C2C] rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#D4AF37] transition-colors duration-200 ${extraClass}`}
+      />
+    </div>
+  );
+
   return (
-    <div className="max-w-xl mx-auto px-4 sm:px-6 py-8">
-      <div className="card p-6">
-        <h1 className="font-display text-xl font-semibold text-ink mb-5">
-          Shipping Details
-        </h1>
+    <div className="min-h-screen bg-[#0D0D0D]">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12">
+        <span className="uppercase tracking-[4px] text-[#D4AF37] text-xs">
+          Almost there
+        </span>
+        <h1 className="text-3xl font-bold text-white mt-3 mb-8">Checkout</h1>
 
-        <form onSubmit={placeOrder} className="space-y-3">
-          <input
-            type="text"
-            name="address"
-            placeholder="Address"
-            value={form.address}
-            onChange={handleChange}
-            required
-            className="input-field"
-          />
+        <form onSubmit={placeOrder}>
+          <div className="grid lg:grid-cols-3 gap-8 items-start">
+            {/* Shipping Details */}
+            <div className="lg:col-span-2 bg-[#171717] border border-[#2C2C2C] rounded-2xl p-6 sm:p-8 space-y-5">
+              <h2 className="text-lg font-bold text-white mb-1">
+                Shipping Details
+              </h2>
 
-          <input
-            type="text"
-            name="city"
-            placeholder="City"
-            value={form.city}
-            onChange={handleChange}
-            required
-            className="input-field"
-          />
+              {floatField("address", "Address")}
 
-          <input
-            type="text"
-            name="postalCode"
-            placeholder="Postal Code"
-            value={form.postalCode}
-            onChange={handleChange}
-            required
-            className="input-field"
-          />
+              <div className="grid sm:grid-cols-2 gap-5">
+                {floatField("city", "City")}
+                {floatField("postalCode", "Postal Code")}
+              </div>
 
-          <input
-            type="text"
-            name="country"
-            placeholder="Country"
-            value={form.country}
-            onChange={handleChange}
-            required
-            className="input-field"
-          />
+              {floatField("country", "Country")}
+            </div>
 
-          {/* Coupon */}
-          <div className="pt-2">
-            {appliedCoupon ? (
-              <div className="flex items-center justify-between bg-teal-50 border border-teal-200 rounded-md px-3 py-2">
-                <span className="text-sm text-teal-700 font-medium inline-flex items-center gap-1.5">
-                  <Tag size={14} />
-                  {appliedCoupon.code} — {appliedCoupon.discountPercent}% off applied
+            {/* Order Summary */}
+            <div className="bg-[#171717] border border-[#2C2C2C] rounded-2xl p-6 sticky top-6">
+              <h2 className="text-lg font-bold text-white mb-5">
+                Order Summary
+              </h2>
+
+              <div className="space-y-2 max-h-48 overflow-y-auto pr-1 mb-5">
+                {cart.map((item) => (
+                  <div
+                    key={item._id}
+                    className="flex justify-between text-sm"
+                  >
+                    <span className="text-gray-300 truncate pr-2">
+                      {item.name}{" "}
+                      <span className="text-gray-500">× {item.qty}</span>
+                    </span>
+                    <span className="text-gray-400 font-mono shrink-0">
+                      ₹{(item.price * item.qty).toFixed(2)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="h-px bg-[#2C2C2C] mb-5" />
+
+              {/* Coupon */}
+              <div className="mb-5">
+                {appliedCoupon ? (
+                  <div className="flex items-center justify-between bg-[#D4AF37]/10 border border-[#D4AF37]/30 rounded-xl px-3 py-2.5">
+                    <span className="text-sm text-[#D4AF37] font-medium inline-flex items-center gap-1.5">
+                      <Tag size={14} />
+                      {appliedCoupon.code} — {appliedCoupon.discountPercent}% off
+                    </span>
+                    <button
+                      type="button"
+                      onClick={removeCoupon}
+                      aria-label="Remove coupon"
+                    >
+                      <X size={15} className="text-[#D4AF37] hover:text-[#E6C75C]" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Coupon code"
+                      value={couponInput}
+                      onChange={(e) => setCouponInput(e.target.value)}
+                      className="flex-1 min-w-0 bg-[#0D0D0D] border border-[#2C2C2C] rounded-xl px-3 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-[#D4AF37] transition-colors"
+                    />
+                    <button
+                      type="button"
+                      onClick={applyCoupon}
+                      disabled={applyingCoupon}
+                      className="shrink-0 border border-[#2C2C2C] text-white text-sm font-medium px-4 py-2.5 rounded-xl hover:border-[#D4AF37] hover:text-[#D4AF37] transition-colors disabled:opacity-50"
+                    >
+                      {applyingCoupon ? "Checking..." : "Apply"}
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between text-gray-400">
+                  <span>Subtotal</span>
+                  <span className="text-white">₹{cartTotal.toFixed(2)}</span>
+                </div>
+
+                {appliedCoupon && (
+                  <div className="flex justify-between text-[#D4AF37]">
+                    <span>Discount ({appliedCoupon.discountPercent}%)</span>
+                    <span>−₹{discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="h-px bg-[#2C2C2C] my-5" />
+
+              <div className="flex justify-between items-center mb-6">
+                <span className="text-white font-semibold">Total</span>
+                <span className="text-2xl font-bold text-[#D4AF37]">
+                  ₹{finalTotal.toFixed(2)}
                 </span>
-                <button type="button" onClick={removeCoupon} aria-label="Remove coupon">
-                  <X size={15} className="text-teal-700" />
-                </button>
               </div>
-            ) : (
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Coupon code"
-                  value={couponInput}
-                  onChange={(e) => setCouponInput(e.target.value)}
-                  className="input-field flex-1"
-                />
-                <button
-                  type="button"
-                  onClick={applyCoupon}
-                  disabled={applyingCoupon}
-                  className="btn-secondary shrink-0"
-                >
-                  {applyingCoupon ? "Checking..." : "Apply"}
-                </button>
-              </div>
-            )}
-          </div>
 
-          <div className="pt-3 space-y-1.5">
-            {appliedCoupon && (
-              <div className="flex items-center justify-between text-sm text-ink/50">
-                <span>Subtotal</span>
-                <span className="font-mono">₹{cartTotal.toFixed(2)}</span>
-              </div>
-            )}
-            {appliedCoupon && (
-              <div className="flex items-center justify-between text-sm text-teal-600">
-                <span>Discount ({appliedCoupon.discountPercent}%)</span>
-                <span className="font-mono">−₹{discountAmount.toFixed(2)}</span>
-              </div>
-            )}
-            <div className="flex items-center justify-between">
-              <span className="font-display text-lg font-medium">Total:</span>
-              <span className="price-tag text-base">₹{finalTotal.toFixed(2)}</span>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full bg-[#D4AF37] text-black font-semibold py-3.5 rounded-xl hover:bg-[#E6C75C] transition-all duration-300 shadow-lg shadow-[#D4AF37]/10 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {submitting ? "Placing Order..." : "Place Order"}
+              </button>
             </div>
           </div>
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="btn-primary w-full"
-          >
-            {submitting ? "Placing Order..." : "Place Order"}
-          </button>
         </form>
       </div>
     </div>
