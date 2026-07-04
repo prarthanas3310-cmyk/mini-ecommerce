@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
+import logo from "../assets/parzen-logo.png";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -45,12 +46,16 @@ export default function Navbar() {
       <nav className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
 
         <Link
-          to="/"
-          className="text-white text-2xl font-bold"
-          onClick={closeMenu}
-        >
-          MiniShop
-        </Link>
+  to="/"
+  onClick={closeMenu}
+  className="flex items-center"
+>
+  <img
+    src={logo}
+    alt="PARZEN"
+    className="h-12 md:h-14 w-auto object-contain"
+  />
+</Link>
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center gap-6">
