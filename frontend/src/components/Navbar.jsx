@@ -6,6 +6,7 @@ import {
   Shield,
   Menu,
   X,
+  Heart,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
@@ -87,6 +88,10 @@ export default function Navbar() {
               <Link to="/orders" className={linkClass}>
                 My Orders
               </Link>
+              <Link to="/wishlist" className={`${linkClass} flex items-center gap-1`}>
+      <Heart size={16} />
+      Wishlist
+    </Link>
 
               <button
                 onClick={handleLogout}
@@ -160,6 +165,16 @@ export default function Navbar() {
               >
                 My Orders
               </Link>
+
+
+    <Link
+      to="/wishlist"
+      onClick={closeMenu}
+      className="block text-white"
+    >
+      Wishlist
+    </Link>
+
 
               <button
                 onClick={handleLogout}

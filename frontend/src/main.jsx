@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import App from "./App.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { CartProvider } from "./context/CartContext.jsx";
+import { WishlistProvider } from "./context/WishlistContext.jsx";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -12,6 +13,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <BrowserRouter>
       <AuthProvider>
         <CartProvider>
+          <WishlistProvider>    
           <App />
           <Toaster
             position="bottom-center"
@@ -28,6 +30,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
               error: { iconTheme: { primary: "#C4573B", secondary: "#F6F4EF" } },
             }}
           />
+          </WishlistProvider>
         </CartProvider>
       </AuthProvider>
     </BrowserRouter>
