@@ -145,8 +145,29 @@ export default function Admin() {
                   <p className="font-mono text-sm text-ink/60">
                     #{order._id.slice(-6)} — {order.user?.name || "Customer"}
                   </p>
-                  <span className="price-tag">₹{order.totalPrice?.toFixed(2)}</span>
+                  <span className="price-tag">₹{order.totalAmount?.toFixed(2)}</span>
                 </div>
+
+                <div className="border-t border-ink/10 py-2 mb-2 space-y-1">
+                  {order.items?.map((item, idx) => (
+                    <div key={idx} className="flex items-center justify-between text-xs text-ink/60">
+                      <span>
+                        {item.name} × {item.quantity}
+                      </span>
+                      <span className="font-mono">
+                        ₹{(item.price * item.quantity).toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {order.shippingAddress && (
+                  <p className="text-xs text-ink/40 mb-2">
+                    {order.shippingAddress.address}, {order.shippingAddress.city},{" "}
+                    {order.shippingAddress.postalCode}, {order.shippingAddress.country}
+                  </p>
+                )}
+
                 <select
                   value={order.status || "pending"}
                   onChange={(e) => handleStatusChange(order._id, e.target.value)}
