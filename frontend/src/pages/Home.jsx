@@ -108,12 +108,12 @@ export default function Home() {
 
             </div>
 
-            <div className="hidden lg:flex items-center justify-center">
+            <div className="flex items-center justify-center mt-8 lg:mt-0">
 
               <img
                 src={logo}
                 alt="PARZEN"
-                className="w-80 object-contain drop-shadow-[0_0_30px_rgba(212,175,55,0.25)] transition-transform duration-500 hover:scale-105"
+                className="w-40 sm:w-56 lg:w-80 object-contain drop-shadow-[0_0_30px_rgba(212,175,55,0.25)] transition-transform duration-500 hover:scale-105"
               />
 
             </div>
