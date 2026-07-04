@@ -5,6 +5,31 @@ import toast from "react-hot-toast";
 import api from "../api/axios";
 import { useCart } from "../context/CartContext";
 
+const COUNTRIES = [
+  "India", "United States", "United Kingdom", "Canada", "Australia",
+  "Germany", "France", "Italy", "Spain", "Netherlands", "Belgium",
+  "Switzerland", "Sweden", "Norway", "Denmark", "Finland", "Ireland",
+  "Portugal", "Austria", "Poland", "Greece", "United Arab Emirates",
+  "Saudi Arabia", "Qatar", "Kuwait", "Bahrain", "Oman", "Singapore",
+  "Malaysia", "Indonesia", "Thailand", "Vietnam", "Philippines",
+  "Japan", "South Korea", "China", "Hong Kong", "Taiwan",
+  "New Zealand", "South Africa", "Nigeria", "Kenya", "Egypt",
+  "Brazil", "Mexico", "Argentina", "Chile", "Colombia", "Peru",
+  "Bangladesh", "Pakistan", "Sri Lanka", "Nepal",
+  "Russia", "Turkey", "Israel", "Other",
+];
+
+const INDIAN_STATES = [
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand",
+  "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
+  "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan",
+  "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh",
+  "Uttarakhand", "West Bengal", "Andaman and Nicobar Islands",
+  "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", "Delhi",
+  "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry",
+];
+
 export default function Checkout() {
   const { cart, cartTotal, clearCart } = useCart();
   const navigate = useNavigate();
@@ -12,8 +37,9 @@ export default function Checkout() {
   const [form, setForm] = useState({
     address: "",
     city: "",
+    state: "",
     postalCode: "",
-    country: "",
+    country: "India",
   });
   const [focusField, setFocusField] = useState(null);
 
@@ -23,7 +49,12 @@ export default function Checkout() {
   const [appliedCoupon, setAppliedCoupon] = useState(null);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === "country" && value !== "India") {
+      setForm((prev) => ({ ...prev, country: value, state: "" }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const discountAmount = appliedCoupon
@@ -131,7 +162,80 @@ export default function Checkout() {
                 {floatField("postalCode", "Postal Code")}
               </div>
 
-              {floatField("country", "Country")}
+              <div className="relative">
+                <label
+                  className={`absolute left-4 transition-all duration-200 pointer-events-none z-10 ${
+                    focusField === "country" || form.country
+                      ? "-top-2.5 text-xs bg-[#171717] px-1 text-[#D4AF37]"
+                      : "top-3.5 text-gray-500"
+                  }`}
+                >
+                  Country
+                </label>
+                <select
+                  name="country"
+                  value={form.country}
+                  onChange={handleChange}
+                  onFocus={() => setFocusField("country")}
+                  onBlur={() => setFocusField(null)}
+                  required
+                  className="w-full bg-[#0D0D0D] border border-[#2C2C2C] rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#D4AF37] transition-colors duration-200 appearance-none cursor-pointer"
+                >
+                  {COUNTRIES.map((c) => (
+                    <option key={c} value={c} className="bg-[#0D0D0D] text-white">
+                      {c}
+                    </option>
+                  ))}
+                </select>
+                <svg
+                  className="absolute right-4 top-4 w-4 h-4 text-gray-500 pointer-events-none"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+
+              {form.country === "India" && (
+                <div className="relative">
+                  <label
+                    className={`absolute left-4 transition-all duration-200 pointer-events-none z-10 ${
+                      focusField === "state" || form.state
+                        ? "-top-2.5 text-xs bg-[#171717] px-1 text-[#D4AF37]"
+                        : "top-3.5 text-gray-500"
+                    }`}
+                  >
+                    State
+                  </label>
+                  <select
+                    name="state"
+                    value={form.state}
+                    onChange={handleChange}
+                    onFocus={() => setFocusField("state")}
+                    onBlur={() => setFocusField(null)}
+                    required
+                    className="w-full bg-[#0D0D0D] border border-[#2C2C2C] rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-[#D4AF37] transition-colors duration-200 appearance-none cursor-pointer"
+                  >
+                    <option value="" disabled className="bg-[#0D0D0D] text-gray-500">
+                      Select a state
+                    </option>
+                    {INDIAN_STATES.map((s) => (
+                      <option key={s} value={s} className="bg-[#0D0D0D] text-white">
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                  <svg
+                    className="absolute right-4 top-4 w-4 h-4 text-gray-500 pointer-events-none"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              )}
             </div>
 
             {/* Order Summary */}

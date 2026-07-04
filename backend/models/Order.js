@@ -22,6 +22,7 @@ const orderSchema = new mongoose.Schema(
     shippingAddress: {
       address: String,
       city: String,
+      state: String,
       postalCode: String,
       country: String,
     },
