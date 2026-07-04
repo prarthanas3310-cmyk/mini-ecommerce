@@ -9,7 +9,7 @@ export default function Cart() {
 
   if (cart.length === 0) {
     return (
-      <div className="min-h-screen bg-[#0D0D0D]">
+      <div className="min-h-screen w-full bg-[#0D0D0D] overflow-x-hidden">
         <div className="max-w-3xl mx-auto px-4">
           <EmptyState
             icon={ShoppingBag}
@@ -33,79 +33,87 @@ export default function Cart() {
   const total = cartTotal + shipping;
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D]">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12">
-        <h1 className="text-3xl font-bold text-white mb-8">Your Cart</h1>
+    <div className="min-h-screen w-full bg-[#0D0D0D] overflow-x-hidden">
+      <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-6 sm:mb-8">
+          Your Cart
+        </h1>
 
-        <div className="grid lg:grid-cols-3 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
           {/* Cart Items */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="lg:col-span-2 space-y-4 w-full min-w-0">
             {cart.map((item) => (
               <div
                 key={item._id}
-                className="bg-[#171717] border border-[#2C2C2C] rounded-2xl p-4 sm:p-5 flex items-center gap-4 hover:border-[#D4AF37]/40 transition-colors duration-300"
+                className="bg-[#171717] border border-[#2C2C2C] rounded-2xl p-4 hover:border-[#D4AF37]/40 transition-colors duration-300 w-full"
               >
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-20 h-20 object-cover rounded-xl border border-[#2C2C2C] flex-shrink-0"
-                />
+                {/* Top row: image + name + price + delete */}
+                <div className="flex items-center gap-3 min-w-0">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-xl border border-[#2C2C2C] flex-shrink-0"
+                  />
 
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-white truncate">
-                    {item.name}
-                  </p>
-                  <span className="text-[#D4AF37] font-bold mt-1 inline-block">
-                    ₹{item.price}
-                  </span>
-                </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-white text-sm sm:text-base truncate">
+                      {item.name}
+                    </p>
+                    <span className="text-[#D4AF37] font-bold text-sm sm:text-base mt-1 inline-block">
+                      ₹{item.price}
+                    </span>
+                  </div>
 
-                <div className="flex items-center bg-[#0D0D0D] border border-[#2C2C2C] rounded-xl overflow-hidden flex-shrink-0">
                   <button
-                    onClick={() => updateQty(item._id, item.qty - 1)}
-                    className="p-2.5 text-white hover:bg-[#222] transition"
-                    aria-label="Decrease quantity"
+                    onClick={() => removeFromCart(item._id)}
+                    className="text-gray-500 hover:text-red-400 p-1.5 transition-colors flex-shrink-0"
+                    aria-label={`Remove ${item.name}`}
                   >
-                    <Minus size={14} />
-                  </button>
-                  <span className="w-8 text-center text-white font-medium text-sm">
-                    {item.qty}
-                  </span>
-                  <button
-                    onClick={() => updateQty(item._id, item.qty + 1)}
-                    className="p-2.5 text-white hover:bg-[#222] transition"
-                    aria-label="Increase quantity"
-                  >
-                    <Plus size={14} />
+                    <Trash2 size={17} />
                   </button>
                 </div>
 
-                <button
-                  onClick={() => removeFromCart(item._id)}
-                  className="text-gray-500 hover:text-red-400 p-2 transition-colors flex-shrink-0"
-                  aria-label={`Remove ${item.name}`}
-                >
-                  <Trash2 size={18} />
-                </button>
+                {/* Bottom row: quantity controls */}
+                <div className="flex justify-end mt-3">
+                  <div className="flex items-center bg-[#0D0D0D] border border-[#2C2C2C] rounded-xl overflow-hidden">
+                    <button
+                      onClick={() => updateQty(item._id, item.qty - 1)}
+                      className="p-2.5 text-white hover:bg-[#222] transition"
+                      aria-label="Decrease quantity"
+                    >
+                      <Minus size={14} />
+                    </button>
+                    <span className="w-8 text-center text-white font-medium text-sm">
+                      {item.qty}
+                    </span>
+                    <button
+                      onClick={() => updateQty(item._id, item.qty + 1)}
+                      className="p-2.5 text-white hover:bg-[#222] transition"
+                      aria-label="Increase quantity"
+                    >
+                      <Plus size={14} />
+                    </button>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
 
           {/* Order Summary */}
-          <div className="bg-[#171717] border border-[#2C2C2C] rounded-2xl p-6 sticky top-6">
+          <div className="bg-[#171717] border border-[#2C2C2C] rounded-2xl p-5 sm:p-6 w-full lg:sticky lg:top-6">
             <h2 className="text-lg font-bold text-white mb-5">
               Order Summary
             </h2>
 
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between text-gray-400">
+              <div className="flex items-center justify-between gap-2 text-gray-400">
                 <span>Subtotal</span>
-                <span className="text-white">₹{cartTotal.toFixed(2)}</span>
+                <span className="text-white shrink-0">₹{cartTotal.toFixed(2)}</span>
               </div>
 
-              <div className="flex justify-between text-gray-400">
+              <div className="flex items-center justify-between gap-2 text-gray-400">
                 <span>Shipping</span>
-                <span className="text-white">
+                <span className="text-white shrink-0">
                   {shipping === 0 ? "Free" : `₹${shipping.toFixed(2)}`}
                 </span>
               </div>
@@ -119,9 +127,9 @@ export default function Cart() {
 
             <div className="h-px bg-[#2C2C2C] my-5" />
 
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center justify-between gap-2 mb-6">
               <span className="text-white font-semibold">Total</span>
-              <span className="text-2xl font-bold text-[#D4AF37]">
+              <span className="text-xl sm:text-2xl font-bold text-[#D4AF37] shrink-0">
                 ₹{total.toFixed(2)}
               </span>
             </div>

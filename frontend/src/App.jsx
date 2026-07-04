@@ -15,8 +15,8 @@ import ScrollToTop from "./components/ScrollToTop";
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-paper">
-       <ScrollToTop />
+    <div className="min-h-screen w-full bg-[#0D0D0D] overflow-x-hidden">
+      <ScrollToTop />
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -24,8 +24,14 @@ export default function App() {
         <Route path="/cart" element={<Cart />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/wishlist" element={ <PrivateRoute>  <Wishlist /> </PrivateRoute> }
-/>
+        <Route
+          path="/wishlist"
+          element={
+            <PrivateRoute>
+              <Wishlist />
+            </PrivateRoute>
+          }
+        />
         <Route
           path="/checkout"
           element={
