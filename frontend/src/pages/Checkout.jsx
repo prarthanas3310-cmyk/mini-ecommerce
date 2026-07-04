@@ -164,11 +164,7 @@ export default function Checkout() {
 
               <div className="relative">
                 <label
-                  className={`absolute left-4 transition-all duration-200 pointer-events-none z-10 ${
-                    focusField === "country" || form.country
-                      ? "-top-2.5 text-xs bg-[#171717] px-1 text-[#D4AF37]"
-                      : "top-3.5 text-gray-500"
-                  }`}
+                  className="absolute left-4 -top-2.5 text-xs bg-[#171717] px-1 text-[#D4AF37] z-10 pointer-events-none"
                 >
                   Country
                 </label>
@@ -200,11 +196,7 @@ export default function Checkout() {
               {form.country === "India" && (
                 <div className="relative">
                   <label
-                    className={`absolute left-4 transition-all duration-200 pointer-events-none z-10 ${
-                      focusField === "state" || form.state
-                        ? "-top-2.5 text-xs bg-[#171717] px-1 text-[#D4AF37]"
-                        : "top-3.5 text-gray-500"
-                    }`}
+                    className="absolute left-4 -top-2.5 text-xs bg-[#171717] px-1 text-[#D4AF37] z-10 pointer-events-none"
                   >
                     State
                   </label>
