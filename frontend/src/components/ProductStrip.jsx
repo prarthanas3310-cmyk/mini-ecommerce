@@ -5,10 +5,7 @@ export default function ProductStrip({ title, products }) {
 
   return (
     <div className="mt-12">
-      <span className="uppercase tracking-[4px] text-[#D4AF37] text-xs">
-        {title}
-      </span>
-      <h2 className="text-xl font-bold text-white mt-2 mb-4">{title}</h2>
+      <h2 className="text-xl font-bold text-white mb-4">{title}</h2>
 
       <div className="flex gap-4 overflow-x-auto pb-2">
         {products.map((p) => (
