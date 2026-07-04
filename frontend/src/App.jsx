@@ -10,6 +10,7 @@ import Signup from "./pages/Signup";
 import MyOrders from "./pages/MyOrders";
 import Admin from "./pages/Admin";
 import Wishlist from "./pages/Wishlist";
+import NotFound from "./pages/NotFound";
 
 export default function App() {
   return (
@@ -47,6 +48,7 @@ export default function App() {
             </PrivateRoute>
           }
         />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   );

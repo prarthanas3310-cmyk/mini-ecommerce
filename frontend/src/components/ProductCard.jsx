@@ -2,11 +2,13 @@ import { Link } from "react-router-dom";
 import { Plus, Heart } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
+import StarRating from "./StarRating";
 
 export default function ProductCard({ product }) {
   const { addToCart } = useCart();
   const { isWishlisted, toggleWishlist } = useWishlist();
   const outOfStock = product.stock <= 0;
+  const lowStock = !outOfStock && product.stock <= 5;
   const saved = isWishlisted(product._id);
 
   return (
@@ -43,6 +45,13 @@ export default function ProductCard({ product }) {
           </h3>
         </Link>
 
+        {product.numReviews > 0 && (
+          <div className="flex items-center gap-1.5">
+            <StarRating value={product.avgRating} size={12} />
+            <span className="text-[11px] text-ink/40">({product.numReviews})</span>
+          </div>
+        )}
+
         <div className="mt-auto pt-2 flex items-center justify-between gap-2">
           <span className="price-tag">₹{product.price}</span>
 
@@ -58,6 +67,7 @@ export default function ProductCard({ product }) {
         </div>
 
         {outOfStock && <span className="text-xs font-mono text-clay">Out of stock</span>}
+        {lowStock && <span className="text-xs font-mono text-clay">Only {product.stock} left</span>}
       </div>
     </div>
   );

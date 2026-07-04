@@ -9,6 +9,8 @@ const productSchema = new mongoose.Schema(
     image: { type: String, required: true },
     stock: { type: Number, required: true, default: 0 },
     sizes: [{ type: String }],
+    avgRating: { type: Number, default: 0 },
+    numReviews: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

@@ -3,27 +3,34 @@ import toast from "react-hot-toast";
 import api from "../api/axios";
 
 const emptyForm = { name: "", description: "", price: "", category: "", image: "", stock: "" };
+const emptyCoupon = { code: "", discountPercent: "" };
 
 const statusColors = {
   pending: "bg-marigold-100 text-marigold-600",
   processing: "bg-teal-50 text-teal-600",
   shipped: "bg-teal-100 text-teal-700",
   delivered: "bg-teal-500 text-white",
+  cancelled: "bg-clay/10 text-clay",
 };
 
 export default function Admin() {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [coupons, setCoupons] = useState([]);
   const [form, setForm] = useState(emptyForm);
+  const [couponForm, setCouponForm] = useState(emptyCoupon);
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [savingCoupon, setSavingCoupon] = useState(false);
 
   const loadProducts = () => api.get("/products").then(({ data }) => setProducts(data));
   const loadOrders = () => api.get("/orders").then(({ data }) => setOrders(data));
+  const loadCoupons = () => api.get("/coupons").then(({ data }) => setCoupons(data));
 
   useEffect(() => {
     loadProducts();
     loadOrders();
+    loadCoupons();
   }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -76,6 +83,34 @@ export default function Admin() {
     loadOrders();
   };
 
+  const handleCouponChange = (e) =>
+    setCouponForm({ ...couponForm, [e.target.name]: e.target.value });
+
+  const handleCouponSubmit = async (e) => {
+    e.preventDefault();
+    setSavingCoupon(true);
+    try {
+      await api.post("/coupons", {
+        code: couponForm.code,
+        discountPercent: Number(couponForm.discountPercent),
+      });
+      toast.success("Coupon created");
+      setCouponForm(emptyCoupon);
+      loadCoupons();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Could not create coupon");
+    } finally {
+      setSavingCoupon(false);
+    }
+  };
+
+  const handleCouponDelete = async (id) => {
+    if (!confirm("Delete this coupon?")) return;
+    await api.delete(`/coupons/${id}`);
+    toast("Coupon deleted", { icon: "🗑️" });
+    loadCoupons();
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 grid grid-cols-1 lg:grid-cols-2 gap-10">
       {/* Products */}
@@ -112,7 +147,7 @@ export default function Admin() {
         </form>
 
         <h2 className="font-display text-lg font-medium text-ink mb-3">Products</h2>
-        <div className="space-y-2">
+        <div className="space-y-2 mb-10">
           {products.map((p) => (
             <div key={p._id} className="card p-3 flex items-center justify-between gap-3">
               <div className="min-w-0">
@@ -129,6 +164,53 @@ export default function Admin() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Coupons */}
+        <h1 className="font-display text-2xl font-semibold text-ink mb-5">Coupons</h1>
+        <form onSubmit={handleCouponSubmit} className="card p-5 flex gap-2 mb-5">
+          <input
+            name="code"
+            placeholder="CODE"
+            value={couponForm.code}
+            onChange={handleCouponChange}
+            required
+            className="input-field flex-1"
+          />
+          <input
+            name="discountPercent"
+            type="number"
+            placeholder="% off"
+            min="1"
+            max="90"
+            value={couponForm.discountPercent}
+            onChange={handleCouponChange}
+            required
+            className="input-field w-24"
+          />
+          <button type="submit" disabled={savingCoupon} className="btn-primary shrink-0">
+            {savingCoupon ? "..." : "Create"}
+          </button>
+        </form>
+
+        <div className="space-y-2">
+          {coupons.length === 0 ? (
+            <p className="text-ink/50 text-sm">No coupons yet.</p>
+          ) : (
+            coupons.map((c) => (
+              <div key={c._id} className="card p-3 flex items-center justify-between">
+                <span className="font-mono text-sm">
+                  {c.code} — <span className="text-teal-600">{c.discountPercent}% off</span>
+                </span>
+                <button
+                  onClick={() => handleCouponDelete(c._id)}
+                  className="text-clay text-sm font-medium hover:underline"
+                >
+                  Delete
+                </button>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
@@ -161,6 +243,12 @@ export default function Admin() {
                   ))}
                 </div>
 
+                {order.couponCode && (
+                  <p className="text-xs text-teal-600 mb-2">
+                    Coupon: {order.couponCode} (−₹{order.discountAmount?.toFixed(2)})
+                  </p>
+                )}
+
                 {order.shippingAddress && (
                   <p className="text-xs text-ink/40 mb-2">
                     {order.shippingAddress.address}, {order.shippingAddress.city},{" "}
@@ -179,6 +267,7 @@ export default function Admin() {
                   <option value="processing">processing</option>
                   <option value="shipped">shipped</option>
                   <option value="delivered">delivered</option>
+                  <option value="cancelled">cancelled</option>
                 </select>
               </div>
             ))}

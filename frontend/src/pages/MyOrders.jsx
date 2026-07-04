@@ -1,27 +1,49 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { PackageOpen } from "lucide-react";
+import toast from "react-hot-toast";
 import api from "../api/axios";
 import EmptyState from "../components/EmptyState";
+import OrderTimeline from "../components/OrderTimeline";
 
 const statusColors = {
   pending: "bg-marigold-100 text-marigold-600",
   processing: "bg-teal-50 text-teal-600",
   shipped: "bg-teal-100 text-teal-700",
   delivered: "bg-teal-500 text-white",
+  cancelled: "bg-clay/10 text-clay",
 };
 
 export default function MyOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [cancellingId, setCancellingId] = useState(null);
 
-  useEffect(() => {
+  const loadOrders = () => {
     api
       .get("/orders/my")
       .then(({ data }) => setOrders(data))
-       .catch((err) => console.error(err))
+      .catch((err) => console.error(err))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadOrders();
   }, []);
+
+  const handleCancel = async (orderId) => {
+    if (!confirm("Cancel this order?")) return;
+    setCancellingId(orderId);
+    try {
+      await api.put(`/orders/${orderId}/cancel`);
+      toast.success("Order cancelled");
+      loadOrders();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Could not cancel order");
+    } finally {
+      setCancellingId(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -75,6 +97,10 @@ export default function MyOrders() {
               </span>
             </div>
 
+            <div className="border-t border-ink/10 py-3">
+              <OrderTimeline status={order.status} />
+            </div>
+
             <div className="border-t border-ink/10 pt-3 space-y-1.5">
               {order.items?.map((item, idx) => (
                 <div key={idx} className="flex items-center justify-between text-sm">
@@ -88,7 +114,25 @@ export default function MyOrders() {
               ))}
             </div>
 
-            <div className="border-t border-ink/10 mt-3 pt-3 flex justify-end">
+            {order.discountAmount > 0 && (
+              <div className="flex items-center justify-between text-sm text-teal-600 pt-2">
+                <span>Coupon ({order.couponCode})</span>
+                <span className="font-mono">−₹{order.discountAmount.toFixed(2)}</span>
+              </div>
+            )}
+
+            <div className="border-t border-ink/10 mt-3 pt-3 flex items-center justify-between">
+              {order.status === "pending" ? (
+                <button
+                  onClick={() => handleCancel(order._id)}
+                  disabled={cancellingId === order._id}
+                  className="text-xs font-medium text-clay hover:underline"
+                >
+                  {cancellingId === order._id ? "Cancelling..." : "Cancel Order"}
+                </button>
+              ) : (
+                <span />
+              )}
               <span className="price-tag">₹{order.totalAmount?.toFixed(2)}</span>
             </div>
           </div>

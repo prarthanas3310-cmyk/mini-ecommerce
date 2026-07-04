@@ -4,6 +4,8 @@ import api from "../api/axios";
 import ProductCard from "../components/ProductCard";
 import ProductCardSkeleton from "../components/ProductCardSkeleton";
 import EmptyState from "../components/EmptyState";
+import ProductStrip from "../components/ProductStrip";
+import { getRecentlyViewed } from "../utils/recentlyViewed";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -11,6 +13,11 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [sort, setSort] = useState("default");
+  const [recent, setRecent] = useState([]);
+
+  useEffect(() => {
+    setRecent(getRecentlyViewed());
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -117,6 +124,8 @@ export default function Home() {
           ))}
         </div>
       )}
+
+      <ProductStrip title="Recently Viewed" products={recent} />
     </div>
   );
 }
