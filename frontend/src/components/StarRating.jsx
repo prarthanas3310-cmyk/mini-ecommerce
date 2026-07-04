@@ -18,8 +18,8 @@ export default function StarRating({ value = 0, size = 14, interactive = false, 
             size={size}
             className={
               star <= Math.round(value)
-                ? "fill-marigold-500 text-marigold-500"
-                : "text-ink/20"
+                ? "fill-[#D4AF37] text-[#D4AF37]"
+                : "text-gray-700"
             }
           />
         </button>

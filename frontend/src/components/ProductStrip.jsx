@@ -5,20 +5,26 @@ export default function ProductStrip({ title, products }) {
 
   return (
     <div className="mt-12">
-      <h2 className="font-display text-lg font-medium text-ink mb-4">{title}</h2>
+      <span className="uppercase tracking-[4px] text-[#D4AF37] text-xs">
+        {title}
+      </span>
+      <h2 className="text-xl font-bold text-white mt-2 mb-4">{title}</h2>
+
       <div className="flex gap-4 overflow-x-auto pb-2">
         {products.map((p) => (
           <Link
             key={p._id}
             to={`/product/${p._id}`}
-            className="card shrink-0 w-40 overflow-hidden hover:-translate-y-1 transition-transform"
+            className="shrink-0 w-40 bg-[#171717] border border-[#2C2C2C] rounded-2xl overflow-hidden hover:border-[#D4AF37]/40 transition-colors duration-300"
           >
-            <div className="aspect-square bg-teal-50">
+            <div className="aspect-square bg-[#0D0D0D]">
               <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
             </div>
-            <div className="p-2.5">
-              <p className="text-sm text-ink font-medium truncate">{p.name}</p>
-              <span className="price-tag mt-1 text-xs">₹{p.price}</span>
+            <div className="p-3">
+              <p className="text-sm text-white font-medium truncate">{p.name}</p>
+              <span className="text-[#D4AF37] font-bold text-xs mt-1 inline-block">
+                ₹{p.price}
+              </span>
             </div>
           </Link>
         ))}

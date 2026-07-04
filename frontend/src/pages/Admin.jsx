@@ -17,6 +17,9 @@ const statusColors = {
 const inputClass =
   "w-full bg-[#0D0D0D] border border-[#2C2C2C] rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:border-[#D4AF37] transition-colors duration-200";
 
+const flexInputClass =
+  "bg-[#0D0D0D] border border-[#2C2C2C] rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:border-[#D4AF37] transition-colors duration-200";
+
 export default function Admin() {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -250,7 +253,7 @@ export default function Admin() {
               value={couponForm.code}
               onChange={handleCouponChange}
               required
-              className={`${inputClass} flex-1`}
+              className={`${flexInputClass} flex-1 min-w-0`}
             />
             <input
               name="discountPercent"
@@ -261,7 +264,7 @@ export default function Admin() {
               value={couponForm.discountPercent}
               onChange={handleCouponChange}
               required
-              className={`${inputClass} w-24`}
+              className={`${flexInputClass} w-24`}
             />
             <button
               type="submit"
