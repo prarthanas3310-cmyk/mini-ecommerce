@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { UploadCloud } from "lucide-react";
 import api from "../api/axios";
 
 const emptyForm = { name: "", description: "", price: "", category: "", image: "", stock: "" };
@@ -25,6 +26,7 @@ export default function Admin() {
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [savingCoupon, setSavingCoupon] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const loadProducts = () => api.get("/products").then(({ data }) => setProducts(data));
   const loadOrders = () => api.get("/orders").then(({ data }) => setOrders(data));
@@ -37,6 +39,26 @@ export default function Admin() {
   }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+      const { data } = await api.post("/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setForm((prev) => ({ ...prev, image: data.url }));
+      toast.success("Image uploaded");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Image upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -134,7 +156,28 @@ export default function Admin() {
             <input name="description" placeholder="Description" value={form.description} onChange={handleChange} className={inputClass} />
             <input name="price" type="number" placeholder="Price" value={form.price} onChange={handleChange} required className={inputClass} />
             <input name="category" placeholder="Category" value={form.category} onChange={handleChange} className={inputClass} />
-            <input name="image" placeholder="Image URL" value={form.image} onChange={handleChange} className={inputClass} />
+            <input name="image" placeholder="Image URL (or upload below)" value={form.image} onChange={handleChange} className={inputClass} />
+
+            <label className="flex items-center gap-2 justify-center border border-dashed border-[#2C2C2C] rounded-xl py-3 cursor-pointer hover:border-[#D4AF37]/50 transition-colors duration-200 text-sm text-gray-400">
+              <UploadCloud size={16} />
+              {uploading ? "Uploading..." : "Or upload an image file"}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                disabled={uploading}
+                className="hidden"
+              />
+            </label>
+
+            {form.image && (
+              <img
+                src={form.image}
+                alt="Preview"
+                className="w-20 h-20 object-cover rounded-xl border border-[#2C2C2C]"
+              />
+            )}
+
             <input name="stock" type="number" placeholder="Stock" value={form.stock} onChange={handleChange} required className={inputClass} />
 
             <div className="flex gap-3 pt-1">
